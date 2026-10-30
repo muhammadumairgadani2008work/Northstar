@@ -1,0 +1,11 @@
+release/main.o
+release/mainwindow.o
+release/createaccount.o
+release/login.o
+release/deposit.o
+release/withdraw.o
+release/balance.o
+release/history.o
+release/password.o
+release/storage.o
+release/moc_mainwindow.o

@@ -1,0 +1,572 @@
+
+#include<iostream>
+#include<fstream>
+using namespace std;
+
+class bankAccount{
+
+private:
+    string AccountNumber;
+    string CustomerName;
+    double Balance;
+    string password;
+
+    string password2;
+    string passwordnew;
+
+    bool loggedin = false;
+
+    string history[100];
+    int count = 0;
+
+public:
+
+    // ================= LOGIN =================
+
+    void login(){
+
+        if(loggedin){
+            cout << "Already logged in.\n";
+            return;
+        }
+
+        string username;
+        string enteredPassword;
+
+        cout << "Enter username: ";
+        cin >> username;
+
+        cout << "Enter password: ";
+        cin >> enteredPassword;
+
+        if(username == CustomerName && enteredPassword == password){
+
+            cout << "Login successfully\n";
+            loggedin = true;
+
+        }
+        else{
+
+            cout << "Invalid username or password\n";
+
+        }
+    }
+
+
+    // ================= CHECK LOGIN =================
+
+    bool isLoggedIn(){
+        return loggedin;
+    }
+
+
+    // ================= CREATE ACCOUNT =================
+
+    bool CreateAccount(){
+
+        cout << "Enter name: ";
+        cin >> CustomerName;
+
+        cout << "Enter Account number: ";
+        cin >> AccountNumber;
+
+        cout << "Enter strong password: ";
+        cin >> password;
+
+        for(int i = 1; i < 4; i++){
+
+            cout << "Enter password to confirm it: ";
+            cin >> password2;
+
+            if(password2 == password){
+
+                cout << "Enter bank balance: ";
+                cin >> Balance;
+
+                cout << "Account created successfully\n";
+
+                saveAccount();
+
+                return true;
+            }
+
+            else{
+
+                cout << "You are left with "
+                     << 3-i
+                     << " attempts\n";
+
+                cout << "Password confirmation failed\n";
+            }
+        }
+
+        cout << "All three attempts failed\n";
+
+        return false;
+    }
+
+
+    // ================= DEPOSIT =================
+
+    void DepositMoney(){
+
+        double amount;
+
+        cout << "Previous amount is: "
+             << Balance << endl;
+
+        cout << "Enter amount: ";
+        cin >> amount;
+
+        if(amount > 0){
+
+            history[count++] =
+                "Deposited Rs:" + to_string(amount);
+
+            Balance += amount;
+
+            saveAccount();
+
+            cout << "After deposit amount is: "
+                 << Balance << endl;
+        }
+
+        else{
+
+            cout << "Invalid amount\n";
+
+        }
+    }
+
+
+    // ================= WITHDRAW =================
+
+    void withdrawMoney(){
+
+        double amount;
+
+        cout << "Enter amount to be withdrawn: ";
+        cin >> amount;
+
+        if(amount > 0 && amount <= Balance){
+
+            history[count++] =
+                "Withdrawn Rs:" + to_string(amount);
+
+            Balance -= amount;
+
+            saveAccount();
+
+            cout << "Amount withdrawn successfully\n";
+
+            cout << "After transaction amount is: "
+                 << Balance <<endl;
+        }
+
+        else{
+
+            cout << "Insufficient balance or invalid amount\n";
+
+        }
+    }
+
+
+    // ================= CHECK BALANCE =================
+
+    void checkbalance(){
+
+        cout << "Your current bank balance is "
+             << Balance << endl;
+    }
+
+
+    // ================= DISPLAY ACCOUNT =================
+
+    void displayAccount(){
+
+        cout << "Customer name is: "
+             << CustomerName << endl;
+
+        cout << "Account number is: "
+             << AccountNumber << endl;
+
+        cout << "Bank balance is: "
+             << Balance << endl;
+    }
+
+
+    // ================= TRANSACTION HISTORY =================
+
+    void TransactionHistory(){
+
+        if(count == 0){
+
+            cout << "No transactions yet.\n";
+            return;
+        }
+
+        cout << "\n===== TRANSACTION HISTORY =====\n";
+
+        for(int i = 0; i < count; i++){
+
+            cout << i + 1 << ". "
+                 << history[i] << endl;
+        }
+    }
+
+
+    // ================= SAVE ACCOUNT =================
+
+    void saveAccount(){
+
+        ofstream file("Bank.txt");
+
+        file << CustomerName << endl;
+        file << AccountNumber << endl;
+        file << Balance << endl;
+
+        // Save number of transactions
+        file << count << endl;
+
+        // Save transactions
+        for(int i = 0; i < count; i++){
+
+            file << history[i] << endl;
+        }
+
+        file.close();
+    }
+
+
+    // ================= LOAD ACCOUNT =================
+
+    bool loadaccount(){
+
+        ifstream file("Bank.txt");
+
+        if(!file){
+
+            cout << "No saved account found.\n";
+
+            return false;
+        }
+
+        getline(file, CustomerName);
+
+        getline(file, AccountNumber);
+
+        file >> Balance;
+
+        // Remove newline after Balance
+        file.ignore();
+
+        // Load transaction count
+        file >> count;
+
+        file.ignore();
+
+        // Load transaction history
+        for(int i = 0; i < count; i++){
+
+            getline(file, history[i]);
+        }
+
+        file.close();
+
+        cout << "\nAccount loaded successfully\n";
+
+        cout << "Customer name: "
+             << CustomerName << endl;
+
+        cout << "Account number: "
+             << AccountNumber << endl;
+
+        cout << "Balance: "
+             << Balance << endl;
+
+        return true;
+    }
+
+
+    // ================= LOGOUT =================
+
+    void logout(){
+
+        if(loggedin){
+
+            loggedin = false;
+
+            cout << "Logged out successfully\n";
+        }
+
+        else{
+
+            cout << "First login\n";
+        }
+    }
+
+
+    // ================= CHANGE PASSWORD =================
+
+    void changePassword(){
+
+        string oldPassword;
+
+        cout << "Enter old password: ";
+        cin >> oldPassword;
+
+        if(password == oldPassword){
+
+            cout << "Enter new password: ";
+            cin >> passwordnew;
+
+            password = passwordnew;
+
+            saveAccount();
+
+            cout << "Password changed successfully\n";
+        }
+
+        else{
+
+            cout << "Invalid old password\n";
+        }
+    }
+};
+
+
+int main(){
+
+    cout << "\n===============================================\n";
+    cout << "========== BANK MANAGEMENT SYSTEM ==========\n";
+    cout << "===============================================\n";
+
+    bankAccount b1;
+
+    bool running = true;
+    bool created = false;
+
+    while(running){
+
+        cout << "\n--------- MENU ---------\n";
+
+        cout << "1. Create Account" << endl;
+        cout << "2. Deposit Money" << endl;
+        cout << "3. Withdraw Money" << endl;
+        cout << "4. Check Balance" << endl;
+        cout << "5. Display Account Details" << endl;
+        cout << "6. View Transaction History" << endl;
+        cout << "7. Load Account" << endl;
+        cout << "8. Change Password" << endl;
+        cout << "9. Login Account" << endl;
+        cout << "10. Logout Account" << endl;
+        cout << "11. Exit" << endl;
+
+        cout << "Enter your choice: ";
+
+        int q;
+        cin >> q;
+
+        switch(q){
+
+            // ================= CREATE =================
+
+            case 1:
+
+                created = b1.CreateAccount();
+
+                break;
+
+
+            // ================= DEPOSIT =================
+
+            case 2:
+
+                if(created){
+
+                    if(b1.isLoggedIn()){
+
+                        b1.DepositMoney();
+                    }
+                    else{
+
+                        cout << "Please login first.\n";
+                    }
+                }
+                else{
+
+                    cout << "First create or load account.\n";
+                }
+
+                break;
+
+
+            // ================= WITHDRAW =================
+
+            case 3:
+
+                if(created){
+
+                    if(b1.isLoggedIn()){
+
+                        b1.withdrawMoney();
+                    }
+                    else{
+
+                        cout << "Please login first.\n";
+                    }
+                }
+                else{
+
+                    cout << "First create or load account.\n";
+                }
+
+                break;
+
+
+            // ================= BALANCE =================
+
+            case 4:
+
+                if(created){
+
+                    if(b1.isLoggedIn()){
+
+                        b1.checkbalance();
+                    }
+                    else{
+
+                        cout << "Please login first.\n";
+                    }
+                }
+                else{
+
+                    cout << "First create or load account.\n";
+                }
+
+                break;
+
+
+            // ================= DISPLAY =================
+
+            case 5:
+
+                if(created){
+
+                    if(b1.isLoggedIn()){
+
+                        b1.displayAccount();
+                    }
+                    else{
+
+                        cout << "Please login first.\n";
+                    }
+                }
+                else{
+
+                    cout << "First create or load account.\n";
+                }
+
+                break;
+
+
+            // ================= HISTORY =================
+
+            case 6:
+
+                if(created){
+
+                    if(b1.isLoggedIn()){
+
+                        b1.TransactionHistory();
+                    }
+                    else{
+
+                        cout << "Please login first.\n";
+                    }
+                }
+                else{
+
+                    cout << "First create or load account.\n";
+                }
+
+                break;
+
+
+            // ================= LOAD =================
+
+            case 7:
+
+                created = b1.loadaccount();
+
+                break;
+
+
+            // ================= CHANGE PASSWORD =================
+
+            case 8:
+
+                if(created){
+
+                    if(b1.isLoggedIn()){
+
+                        b1.changePassword();
+                    }
+                    else{
+
+                        cout << "Please login first.\n";
+                    }
+                }
+                else{
+
+                    cout << "First create or load account.\n";
+                }
+
+                break;
+
+
+            // ================= LOGIN =================
+
+            case 9:
+
+                if(created){
+
+                    b1.login();
+                }
+                else{
+
+                    cout << "First create or load account.\n";
+                }
+
+                break;
+
+
+            // ================= LOGOUT =================
+
+            case 10:
+
+                b1.logout();
+
+                break;
+
+
+            // ================= EXIT =================
+
+            case 11:
+
+                running = false;
+
+                cout << "Program exits\n";
+
+                break;
+
+
+            default:
+
+                cout << "Invalid choice\n";
+        }
+    }
+
+    return 0;
+}
+

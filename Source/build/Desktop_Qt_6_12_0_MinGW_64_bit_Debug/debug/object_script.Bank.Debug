@@ -1,0 +1,11 @@
+debug/main.o
+debug/mainwindow.o
+debug/createaccount.o
+debug/login.o
+debug/deposit.o
+debug/withdraw.o
+debug/balance.o
+debug/history.o
+debug/password.o
+debug/storage.o
+debug/moc_mainwindow.o
